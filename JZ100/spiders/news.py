@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
-
-import copy
+from copy import deepcopy
 import scrapy
 from JZ100.items import NewsItem
 from urllib import parse
@@ -20,50 +19,47 @@ class NewsSpider(scrapy.Spider):
 
 
     def start_requests(self):
-        with open('d:\\test.txt','r',encoding='utf-8') as f:
+        with open('c:\\test.txt','r',encoding='utf-8') as f:
             keywords = f.readlines()
             for keyword in keywords:
                 print(keyword)
-                start_urls = 'https://search.sina.com.cn/?q={}&range=all&c=news&sort=rel'.format(parse.quote(keyword.encode('gb2312')))
+                start_urls = 'https://search.sina.com.cn/?q={}&range=all&c=news&sort=time'.format(parse.quote(keyword.encode('gb2312')))
                 print(start_urls)
                 yield scrapy.Request(url = start_urls,callback = self.parse,dont_filter=True,meta = {'company' :keyword})
 
 
     def parse(self, response):
-        keyword =response.meta['company']
-
-        news_amount = response.css('.l_v2').xpath("text()").extract_first()
+        item =NewsItem()
+        item['company'] =response.meta['company']
+        news_amount = response.css('.l_v2::text').extract_first()
         amount = re.search(r'\d+(,\d+)*',news_amount)
         # 相关新闻数量
-        amount = int(amount.group(0).replace(',',''))
-
+        item['amount'] = int(amount.group(0).replace(',',''))
         print (amount)
-        # 相关新闻网站
-        url_list = response.css(".r-info h2 a").xpath("@href").extract()
+        # 相关新闻网址
+        url_list = response.css(".result .box-result ")
+        print (url_list)
+        if url_list is not None:
+            for u in url_list:
+                item['title'] = u.xpath(".//h2/a/text()").extract()
+                item['href'] = u.xpath(".//h2/a/@href").extract_first()
+                item['brief'] = u.xpath(".//p//text()").extract()
+
+                # item['brief'] = re.findall("[\u4e00-\u9fa5]",item['brief'])
+                item['brief'] = "".join(item['brief'])
+                print(item)
+                # yield scrapy.Request(item['href'], callback = self.pare_detail, dont_filter=True,meta ={'item' : deepcopy(item)})
 
 
-        company = keyword
-
-        next_page = response.xpath("//a[text()='下一页']/@href").extract_first()
-        print (next_page)
-        if next_page:
-            yield scrapy.Request(url = 'https://search.sina.com.cn' + next_page , callback = self.parse,meta = {'company' :keyword,
-                                                                                                                'list':url_list})
-
-        for url in url_list:
-             yield scrapy.Request(url = url,callback = self.pare_detail,meta = {'company':company,
-                                                                                'amount' :amount
-                                                                                })
+        # next_page = response.xpath("//a[text()='下一页']/@href").extract_first()
 
     def pare_detail(self,response):
 
-        item = NewsItem()
-        item['company'] = response.meta['company']
-        item['amount'] =response.meta['amount']
-        item['title'] = response.xpath("//h1[@id='artibodyTitle']/text()").extract()[0]
-        item['content'] =ListCombiner(response.xpath('//p/text()').extract()[:-3])
+        item = response.meta["item"]
+        # item['title'] = response.xpath("//h1[@id='artibodyTitle']//text()").extract()
+        # item['content'] =ListCombiner(response.xpath('//p/text()').extract()[:-3])
         print (item)
-        # print(url_list)
+
 
 
 

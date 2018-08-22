@@ -21,3 +21,4 @@ class NewsItem(scrapy.Item):
     amount = Field()
     href = Field()
     publish_data = Field()
+    brief = Field()
