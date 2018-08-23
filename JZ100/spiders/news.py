@@ -4,6 +4,10 @@ from copy import deepcopy
 import scrapy
 from JZ100.items import NewsItem
 from urllib import parse
+from scrapy.spidermiddlewares.httperror import HttpError
+from twisted.internet.error import DNSLookupError
+from twisted.internet.error import TimeoutError, TCPTimedOutError
+
 
 def ListCombiner(lst):
     string = ""
@@ -18,7 +22,7 @@ class NewsSpider(scrapy.Spider):
 
 
     def start_requests(self):
-        with open('d:\\test.txt','r',encoding='utf-8') as f:
+        with open('c:\\test.txt','r',encoding='utf-8') as f:
             keywords = f.readlines()
             for keyword in keywords:
                 print(keyword)
@@ -66,7 +70,7 @@ class NewsSpider(scrapy.Spider):
         item = response.meta["item"]
         # item['content'] =ListCombiner(response.css('#artibody').xpath('//p/text()').extract()[:-3])
         print (item)
-        return item
+        yield item
 
 
 

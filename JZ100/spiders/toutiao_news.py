@@ -5,6 +5,9 @@ from copy import deepcopy
 import scrapy
 from JZ100.items import NewsItem
 from urllib import parse
+from scrapy.spidermiddlewares.httperror import HttpError
+from twisted.internet.error import DNSLookupError
+from twisted.internet.error import TimeoutError, TCPTimedOutError
 
 def ListCombiner(lst):
     string = ""

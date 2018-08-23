@@ -17,11 +17,16 @@ NEWSPIDER_MODULE = 'JZ100.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'JZ100 (+http://www.yourdomain.com)'
+USER_AGENTS = 'Mozilla/5.0(Macintosh;U;IntelMacOSX10_6_8;en-us)AppleWebKit/534.50(KHTML,likeGecko)Version/5.1Safari/534.50','Mozilla/5.0(Windows;U;WindowsNT6.1;en-us)AppleWebKit/534.50(KHTML,likeGecko)Version/5.1Safari/534.50','Mozilla/5.0(compatible;MSIE9.0;WindowsNT6.1;Trident/5.0'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
 LOG_LEVEL = "WARNING"
+LOG_FILE ='./EROR.LOG'
+
+MONGO_URI='localhost'
+MONGO_DB ='NEWS'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -61,11 +66,15 @@ DEFAULT_REQUEST_HEADERS = {
 #    'JZ100.middlewares.Jz100SpiderMiddleware': 543,
 #}
 
+
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
-#    'JZ100.middlewares.Jz100DownloaderMiddleware': 543,
-#}
+DOWNLOADER_MIDDLEWARES = {
+   # 'JZ100.middlewares.Jz100DownloaderMiddleware': 543,
+   #  'JZ100.middlewares.ProxyMiddleware': 543,
+    'JZ100.middlewares.UseragentMiddleware': 544,
+    'JZ100.middlewares.MyRetryMiddleware': 500,
+}
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
@@ -75,9 +84,11 @@ DEFAULT_REQUEST_HEADERS = {
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#    'JZ100.pipelines.Jz100Pipeline': 300,
-# }
+ITEM_PIPELINES = {
+   # 'JZ100.pipelines.Jz100Pipeline': 300,
+    'JZ100.pipelines.MongoPipeline': 300,
+
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -99,3 +110,8 @@ DEFAULT_REQUEST_HEADERS = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+RETRY_ENABLED = True
+RETRY_TIMES = 2
+# RETRY_HTTP_CODES= [500, 503, 504, 400, 408]
+RETRY_PRIORITY_ADJUST = - 1
+RETRY_HTTP_CODES = [500, 502, 503, 504, 522, 524, 408]

@@ -24,3 +24,4 @@ class NewsItem(scrapy.Item):
     abstract = Field()
     source = Field()
     content= Field()
+    collection = table = 'News'
