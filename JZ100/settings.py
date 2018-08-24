@@ -74,6 +74,7 @@ DOWNLOADER_MIDDLEWARES = {
    #  'JZ100.middlewares.ProxyMiddleware': 543,
     'JZ100.middlewares.UseragentMiddleware': 544,
     'JZ100.middlewares.MyRetryMiddleware': 500,
+    # 'JZ100.middlewares.LocalRetryMiddleware' : 500
 }
 
 # Enable or disable extensions
@@ -111,7 +112,7 @@ ITEM_PIPELINES = {
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 RETRY_ENABLED = True
-RETRY_TIMES = 2
+RETRY_TIMES = 3
 # RETRY_HTTP_CODES= [500, 503, 504, 400, 408]
 RETRY_PRIORITY_ADJUST = - 1
 RETRY_HTTP_CODES = [500, 502, 503, 504, 522, 524, 408]
